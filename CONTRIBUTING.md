@@ -105,25 +105,7 @@ We welcome contributions. The project supports multiple channels (Feishu impleme
 
 （此节仅作说明，不要求贡献者必须执行。）
 
----
-
-## 发布到 npm / Publish to npm
-
-**推荐：GitHub Actions 自动发布（无需本机操作）**
-
-1. 在 GitHub 仓库 **Settings → Secrets and variables → Actions** 中新增 secret：`NPM_TOKEN`，值为 npm 的 [Access Token](https://www.npmjs.com/settings/~/tokens)（需有 Publish 权限；若账号开启 2FA，可用 Granular token 并勾选 Bypass 2FA）。
-2. 发版时在本地或网页：把 `package.json` 里 `version` 改为新版本（如 `0.1.1`），commit 并 push；然后打 tag 并推送，例如：
-   ```bash
-   git tag v0.1.1 && git push origin v0.1.1
-   ```
-3. 推送 tag 后，GitHub Actions 会自动运行 **Publish to npm** workflow，执行 `npm publish`，无需在本机执行 `npm login` / `npm publish`。
-
-**CI**：每次 push 到 `master`/`main` 会跑 **CI** workflow（安装、构建 dist、轻量加载校验）；不依赖飞书环境变量。
-
-**手动发布（可选）**
-
-1. 在 [npmjs.com](https://www.npmjs.com/) 登录；本机 `npm login`。
-2. 仓库根目录执行 `npm run build:dist`，再 `npm publish`（或 `npm publish --access public` 若为 scope 包）。
+发版 npm 由 GitHub Actions 在推送 `v*` tag 时自动执行，见 `.github/workflows/publish.yml`，无需写入贡献说明。
 
 ---
 
