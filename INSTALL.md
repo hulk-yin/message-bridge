@@ -37,7 +37,7 @@ skill-message-bridge "你要发的内容"
 
 配置好环境变量 `FEISHU_APP_ID`、`FEISHU_APP_SECRET`、`FEISHU_CHAT_ID` 后即可使用。若需在 Cursor/Codex 中作为「可加载的 skill」（含 SKILL.md 说明），需将 skill 目录指向 `node_modules/skill-message-bridge`，或同时用下面的 Git 方式安装 SKILL 到 `.cursor/skills/`。
 
-**发布状态**：包名 `skill-message-bridge`，发布到 npm 后可直接 `npm install`。当前若未发布，可用 `npm install github:hulk-yin/message-bridge` 从 GitHub 安装。
+**发布状态**：已上架 npm，包名 `skill-message-bridge`，直接 `npm install skill-message-bridge`。亦可从 GitHub 安装：`npm install github:hulk-yin/message-bridge`。
 
 ---
 

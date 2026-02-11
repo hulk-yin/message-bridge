@@ -107,7 +107,7 @@ MIT
 
 ## 安装方式 / Install
 
-- **npm**：`npm install skill-message-bridge`（发布后）；未发布可 `npm install github:hulk-yin/message-bridge`。代码中 `require("skill-message-bridge")`，命令行 `npx skill-message-bridge "..."`。
+- **npm**：`npm install skill-message-bridge`（已上架 [npm](https://www.npmjs.com/package/skill-message-bridge)）。代码中 `require("skill-message-bridge")`，命令行 `npx skill-message-bridge "..."`。
 - **Skill（Cursor / Codex / Claude）**：见 **[INSTALL.md](./INSTALL.md)**，支持 Git 克隆到各环境 skill 目录或从 npm 安装后使用。
 
 ## English (short)
