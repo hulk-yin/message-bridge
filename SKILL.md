@@ -2,6 +2,8 @@
 
 AI 智能体的消息桥梁，连接飞书/钉钉/企微，实现异步通知与确认。
 
+**实现位置**：本仓库根目录即为 skill 实现目录。安装到 Cursor/Codex/Claude 等后，所有命令（如 `npm run turn`、`node dist/feishu-turn.js`）均在**该 skill 目录**下执行，不依赖绝对路径。安装方式见 [INSTALL.md](./INSTALL.md)。
+
 ## 功能
 
 - ✅ 发送消息到飞书群聊

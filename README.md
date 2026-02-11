@@ -73,6 +73,7 @@ await messageBridge.send({
 
 ## 文档 / Docs
 
+- [INSTALL.md](./INSTALL.md) - **安装为 Cursor / Codex / Claude Code Skill**（中英）
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - 贡献流程、新渠道接入、单测与 AI 友好说明（中英）
 - [SKILL.md](./SKILL.md) - 与 AI 技能/闭环使用相关的详细说明
 
@@ -103,6 +104,10 @@ await messageBridge.send({
 MIT
 
 ---
+
+## Install as Skill (Cursor / Codex / Claude Code)
+
+See **[INSTALL.md](./INSTALL.md)** for one-command install into Cursor (project or global), Codex (`install-skill-from-github.py`), or any skill-capable environment. All commands run from the repo root after clone.
 
 ## English (short)
 
