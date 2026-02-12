@@ -107,7 +107,7 @@ DITING_FEISHU_CHAT_ID="oc_2ffdc43f1b0b8fbde82e1548f2ae6ed4" \
 node test.js
 
 # WebSocket 调试测试
-node test-ws-debug.js
+node test-quick.js
 ```
 
 ## 配置信息

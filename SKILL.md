@@ -227,7 +227,7 @@ npx skill-message-bridge send "测试"
 npx skill-message-bridge "请回复测试"   # 或 npx skill-message-bridge notify "..." --timeout=60
 ```
 
-在仓库内还可运行：`node test-quick.js`、`node test.js`、`node test-complete.js`、`node test-ws-debug.js`。
+在仓库内还可运行：`node test.js`（主测试）、`node test-quick.js`（快速 notify）、`node test-complete.js`（完整功能）、`node test-session-bridge.js`（Session Bridge）。
 
 ## 更多参考
 

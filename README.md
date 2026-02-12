@@ -84,13 +84,16 @@ await messageBridge.send({
 
 详细进度请查看 [PROGRESS.md](./PROGRESS.md)
 
-## 测试
+## 测试与示例
 
-- `test.js` - 基础消息发送测试
-- `test-sdk.js` - SDK 功能测试
-- `test-ws-debug.js` - WebSocket 调试测试
-- `test-complete.js` - 完整功能测试
-- `test-quick.js` - 快速测试
+**正式测试**（需配置飞书凭证或 config 文件）：
+- `test.js` - 主测试（凭证 + 发送），`npm test`
+- `test-quick.js` - 快速 notify（发并等回复）
+- `test-complete.js` - 完整功能（notify + send）
+- `test-session-bridge.js` - Session Bridge（切到飞书/切回）
+
+**示例**（参考用）：`example-claude-code.js`、`example-ai-wrapper.js`、`example-async.js`、`example-polling.js`  
+详见 [docs/TESTS-AND-SCRIPTS.md](./docs/TESTS-AND-SCRIPTS.md)。
 
 ## 技术栈
 
