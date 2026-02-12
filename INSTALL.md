@@ -1,6 +1,38 @@
 # 安装为 Skill / Install as Skill
 
-本仓库可作为 **Skill** 被 Cursor、Codex、Claude Code 等 AI 编码环境加载，实现「会话切换到飞书/钉钉」、发消息、等回复等能力。**推荐**：无需安装，直接使用 **npx** 完成全部操作。
+本仓库可作为 **Skill** 被 Cursor、Codex、Claude Code、VS Code（Claude 插件）等 AI 编码环境加载，实现「会话切换到飞书/钉钉」、发消息、等回复等能力。**推荐**：无需安装，直接使用 **npx** 完成全部操作。
+
+---
+
+## Install 指令（推荐：一条命令安装到目标工具）
+
+在任意目录执行 **`npx skill-message-bridge install`**，可按目标工具自动 clone 仓库、执行 `npm install` 与 `npm run build`，无需手写路径。
+
+```bash
+# 安装到 Cursor（当前项目 .cursor/skills/message-bridge）
+npx skill-message-bridge install --target=cursor
+
+# 安装到 Cursor 用户级（所有项目可用）
+npx skill-message-bridge install --target=cursor --global
+
+# 安装到 Codex（$CODEX_HOME/skills，默认 ~/.codex/skills）
+npx skill-message-bridge install --target=codex
+
+# 安装到 Claude Code / VS Code 常用目录（~/.claude/skills）
+npx skill-message-bridge install --target=claude-code
+
+# 未知工具或国内 IDE：指定 skills 根目录，将安装到 <dir>/message-bridge
+npx skill-message-bridge install --dir=/path/to/your/skills/root
+```
+
+| 目标 | 说明 |
+|------|------|
+| `--target=cursor` | 当前项目 `.cursor/skills/message-bridge`；加 `--global` 为 `~/.cursor/skills/message-bridge` |
+| `--target=codex` | `$CODEX_HOME/skills/message-bridge`（未设置则 `~/.codex/skills/message-bridge`） |
+| `--target=claude-code` / `vscode` | `~/.claude/skills/message-bridge`（可按你本地约定改用 `--dir`） |
+| `--dir=/path` | 安装到 `/path/message-bridge`，适合国内 IDE 或自定义 skills 目录 |
+
+安装后重启对应 IDE 或重新加载 skills，并配置飞书环境变量（见 [ONBOARDING-FEISHU](./docs/ONBOARDING-FEISHU.md)）。
 
 ---
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.1] - 2026-02-12
+
+### Added
+
+- **install 命令**：`npx skill-message-bridge install` 可将本 skill 安装到目标工具；无参数时为交互式（方向键选择 Cursor/Codex/Claude Code/其他），支持 `--target`、`--dir`。
+- **心跳可连续调用**：SKILL 与超时 sessionHint 明确「若心跳返回仍为 timeout，继续再发 --heartbeat，勿只发一次就停」。
+
+### Changed
+
+- 超时时的 sessionHint 增加「若返回仍为 timeout，继续再发 --heartbeat」说明；SKILL 灵魂级约束与闭环同步更新。
+
+---
+
 ## [0.2.0] - 2026-02-12
 
 ### Added

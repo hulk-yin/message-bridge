@@ -41,7 +41,9 @@ const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const os = __importStar(require("os"));
 const readline = __importStar(require("readline"));
+const child_process_1 = require("child_process");
 const mb = __importStar(require("./index"));
+const REPO_URL = "https://github.com/hulk-yin/message-bridge.git";
 function prompt(question, opts) {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     return new Promise((resolve) => {
@@ -81,8 +83,8 @@ const CONFIG_PATH = path.join(CONFIG_DIR, "config.json");
 const FEISHU_PAIRING_SUCCESS_GUIDE = "配对成功！已自动保存本会话，下次在 Cursor/Codex 里你只要说「切换到飞书」「切到飞书」或「离开一会」，就可以把对话切到这里继续和青鸟对话；说「结束」或「切回」则切回。";
 /** 每轮返回给调用方的会话提示，避免 Cursor 等忘记 in-loop 约束自动退出。不做内容匹配，是否结束由调用方根据语义判断。 */
 const SESSION_HINT_CONTINUE = "用户未说「结束」或「切回」前请继续循环发消息，勿退出飞书会话。";
-/** 超时时的明确指令：让调用方执行 --heartbeat 重新拉起会话。 */
-const SESSION_HINT_TIMEOUT = "本轮超时，请执行 npx skill-message-bridge --heartbeat [--timeout=N] 重新拉起会话，勿退出。";
+/** 超时时的明确指令：让调用方执行 --heartbeat 重新拉起；若心跳再超时则继续发心跳，不要只发一次就停。 */
+const SESSION_HINT_TIMEOUT = "本轮超时，请执行 npx skill-message-bridge --heartbeat [--timeout=N] 重新拉起会话；若返回仍为 timeout，继续再发 --heartbeat，勿只发一次就停，勿退出。";
 function sessionHint(status, _reply) {
     return status === "timeout" ? SESSION_HINT_TIMEOUT : SESSION_HINT_CONTINUE;
 }
@@ -221,6 +223,7 @@ skill-message-bridge（青鸟）— 飞书/钉钉/企微 消息桥梁（npx 优�
   npx skill-message-bridge <消息>              发到飞书并等待回复（默认 notify）
   npx skill-message-bridge notify <消息> [--timeout=N]  同上，可指定超时秒数
   npx skill-message-bridge --heartbeat [--timeout=N]  仅等待下一条消息，不向飞书推送（心跳）
+  npx skill-message-bridge install [--target=cursor|codex|claude-code|vscode] [--global] [--dir=/path]  将本 skill 安装到目标工具（已知 target 按规则存放；未知用 --dir 指定 skills 根目录）
   npx skill-message-bridge send <消息>        只发送，不等待回复
   npx skill-message-bridge check-env          检查配置（环境变量或 ~/.message-bridge/config.json）
   npx skill-message-bridge config set feishu [--app-id=xxx] [--app-secret=xxx] [--chat-id=xxx]  写入配置（缺省项可交互输入）
@@ -368,6 +371,87 @@ async function main() {
         }
         console.error("用法: config set feishu --app-id=xxx --app-secret=xxx [--chat-id=xxx] | config show | config path");
         process.exit(1);
+    }
+    if (a0 === "install") {
+        const getOpt = (name) => {
+            for (let i = 0; i < argv.length; i++) {
+                if (argv[i] === `--${name}` && argv[i + 1] != null)
+                    return argv[i + 1];
+                if (argv[i].startsWith(`--${name}=`))
+                    return argv[i].replace(new RegExp(`^--${name}=`), "");
+            }
+            return undefined;
+        };
+        const dir = getOpt("dir");
+        const targetOpt = getOpt("target");
+        const globalFlag = argv.includes("--global");
+        const doInstall = (destDir) => {
+            if (fs.existsSync(destDir)) {
+                console.error("目标已存在: " + destDir + "，请先删除或选择其他路径");
+                process.exit(1);
+            }
+            fs.mkdirSync(path.dirname(destDir), { recursive: true });
+            console.log("安装到: " + destDir);
+            (0, child_process_1.execSync)(`git clone --depth 1 ${REPO_URL} "${destDir}"`, { stdio: "inherit" });
+            (0, child_process_1.execSync)("npm install", { cwd: destDir, stdio: "inherit" });
+            (0, child_process_1.execSync)("npm run build", { cwd: destDir, stdio: "inherit" });
+            console.log("安装完成。请重启对应 IDE 或重新加载 skills，并配置飞书环境变量（见 docs/ONBOARDING-FEISHU.md）。");
+            process.exit(0);
+        };
+        if (dir) {
+            doInstall(path.resolve(dir, "message-bridge"));
+            return;
+        }
+        if (targetOpt) {
+            const target = targetOpt.toLowerCase();
+            if (target === "cursor") {
+                doInstall(globalFlag
+                    ? path.join(os.homedir(), ".cursor", "skills", "message-bridge")
+                    : path.join(process.cwd(), ".cursor", "skills", "message-bridge"));
+            }
+            else if (target === "codex") {
+                const codexHome = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
+                doInstall(path.join(codexHome, "skills", "message-bridge"));
+            }
+            else if (target === "claude-code" || target === "vscode") {
+                doInstall(path.join(os.homedir(), ".claude", "skills", "message-bridge"));
+            }
+            else {
+                console.error("未知 target，请用 1–5 选择或 --dir=/path");
+                process.exit(1);
+            }
+            return;
+        }
+        const runInteractive = async () => {
+            const { default: select } = await Promise.resolve().then(() => __importStar(require("@inquirer/select")));
+            const choice = await select({
+                message: "请选择要安装到的工具（方向键选择，回车确认）",
+                choices: [
+                    { value: "cursor-project", name: "Cursor（当前项目 .cursor/skills）" },
+                    { value: "cursor-global", name: "Cursor（用户级，所有项目可用）" },
+                    { value: "codex", name: "Codex（$CODEX_HOME/skills）" },
+                    { value: "claude-vscode", name: "Claude Code / VS Code（~/.claude/skills）" },
+                    { value: "other", name: "其他（手动输入 skills 根目录路径）" },
+                ],
+            });
+            if (choice === "cursor-project")
+                return path.join(process.cwd(), ".cursor", "skills", "message-bridge");
+            if (choice === "cursor-global")
+                return path.join(os.homedir(), ".cursor", "skills", "message-bridge");
+            if (choice === "codex")
+                return path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "skills", "message-bridge");
+            if (choice === "claude-vscode")
+                return path.join(os.homedir(), ".claude", "skills", "message-bridge");
+            const rl2 = readline.createInterface({ input: process.stdin, output: process.stdout });
+            const pathAnswer = await new Promise((res) => rl2.question("请输入 skills 根目录路径: ", (a) => { rl2.close(); res((a || "").trim()); }));
+            if (!pathAnswer)
+                throw new Error("未输入路径，已取消");
+            return path.resolve(pathAnswer, "message-bridge");
+        };
+        runInteractive()
+            .then(doInstall)
+            .catch((err) => { console.error(err.message); process.exit(1); });
+        return;
     }
     if (a0 === "connect") {
         console.log("正在启动飞书长连接…\n");
