@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.2] - 2026-02-12
+
+### Fixed
+
+- **超时不再以失败退出**：`notify` 与 `--heartbeat` 在 `status: "timeout"` 时改为 `exit(0)`，仅 `status: "error"` 时 `exit(1)`，避免被系统报为 failed。
+- 心跳在 timeout 时输出与 notify 一致的 sessionHint（含「继续再发 --heartbeat」）。
+
+---
+
 ## [0.2.1] - 2026-02-12
 
 ### Added

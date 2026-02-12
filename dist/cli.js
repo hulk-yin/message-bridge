@@ -520,7 +520,7 @@ async function main() {
                 out.error = result.error;
             console.log(JSON.stringify(out));
             printSessionReminder();
-            process.exit(result.status === "replied" ? 0 : 1);
+            process.exit(result.status === "error" ? 1 : 0);
         }
         catch (err) {
             const errOut = { status: "error", reply: "", error: err.message, sessionHint: SESSION_HINT_CONTINUE };
@@ -541,13 +541,13 @@ async function main() {
                 status: result.status || "error",
                 reply: result.reply || "",
                 replyUser: result.replyUser || "",
-                sessionHint: SESSION_HINT_CONTINUE,
+                sessionHint: sessionHint(result.status || "error", result.reply || ""),
             };
             if (result.error)
                 out.error = result.error;
             console.log(JSON.stringify(out));
             printSessionReminder();
-            process.exit(result.status === "replied" ? 0 : 1);
+            process.exit(result.status === "error" ? 1 : 0);
         }
         catch (err) {
             const errOut = { status: "error", reply: "", error: err.message, sessionHint: SESSION_HINT_CONTINUE };
@@ -577,7 +577,7 @@ async function main() {
             out.error = result.error;
         console.log(JSON.stringify(out));
         printSessionReminder();
-        process.exit(result.status === "replied" ? 0 : 1);
+        process.exit(result.status === "error" ? 1 : 0);
     }
     catch (err) {
         const errOut = { status: "error", reply: "", error: err.message, sessionHint: SESSION_HINT_CONTINUE };
