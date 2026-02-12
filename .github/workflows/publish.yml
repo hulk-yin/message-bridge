@@ -31,5 +31,12 @@ jobs:
       - name: Install
         run: npm ci
 
-      # 发布时利用 OIDC 交换临时 Token，并写入 provenance
-      - run: npm publish --provenance --access public
+      # 预发布版本（含 -）需指定 --tag，否则 npm 报错
+      - name: Publish
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if echo "$VERSION" | grep -q '-'; then
+            npm publish --tag beta --provenance --access public
+          else
+            npm publish --provenance --access public
+          fi
