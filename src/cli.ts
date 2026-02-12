@@ -52,8 +52,12 @@ const FEISHU_PAIRING_SUCCESS_GUIDE =
 const SESSION_HINT_CONTINUE =
   "用户未说「结束」或「切回」前请继续循环发消息，勿退出飞书会话。";
 
-function sessionHint(_status: string, _reply: string): string {
-  return SESSION_HINT_CONTINUE;
+/** 超时时的明确指令：让调用方执行 --heartbeat 重新拉起会话。 */
+const SESSION_HINT_TIMEOUT =
+  "本轮超时，请执行 npx skill-message-bridge --heartbeat [--timeout=N] 重新拉起会话，勿退出。";
+
+function sessionHint(status: string, _reply: string): string {
+  return status === "timeout" ? SESSION_HINT_TIMEOUT : SESSION_HINT_CONTINUE;
 }
 
 /** 会话回复后自动补一句给调用方（Cursor 等）的提醒。输出到 stderr，不破坏 stdout 单行 JSON。 */

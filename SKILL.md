@@ -61,7 +61,7 @@ npx skill-message-bridge "<内容>"
 npx skill-message-bridge "<内容>" --timeout=3600   # 可选：单轮超时秒数
 ```
 
-- 把 `<内容>` 发到飞书并等待用户回复；stdout 输出单行 JSON（`status`、`reply`、`sessionHint` 等）。
+- 把 `<内容>` 发到飞书并等待用户回复；**stdout 仅输出一行 JSON**（`status`、`reply`、`replyUser`、`sessionHint` 等），便于 agent 解析、避免历史噪音；[MessageBridge] 等日志在 stderr，解析时只认 stdout 该行 JSON 即可。
 - 消息也可从 stdin 传入：`echo "内容" | npx skill-message-bridge`。
 - **「到飞书」/ 会话切换**：只循环调用这一条命令，由 AI 维持会话，直到用户说「结束」或「切回」。
 
@@ -218,7 +218,7 @@ npx skill-message-bridge "<内容>" --timeout=3600   # 可选
 ```
 
 - 把内容发到飞书并等待用户回复；stdout 输出单行 JSON：`{"status":"replied","reply":"用户回复", "replyUser":"?", "sessionHint":"..."}`，超时为 `"status":"timeout"`。
-- **sessionHint**：固定为「用户未说「结束」或「切回」前请继续循环发消息，勿退出飞书会话」。是否退出由调用方根据用户回复语义判断，本 skill 不做内容匹配。
+- **sessionHint**：通常为「用户未说「结束」或「切回」前请继续循环发消息，勿退出飞书会话」。**当 status 为 "timeout" 时**，sessionHint 会改为明确指令：「本轮超时，请执行 npx skill-message-bridge --heartbeat [--timeout=N] 重新拉起会话，勿退出。」调用方按此执行即可。
 - stderr 会提示：`[MessageBridge] 请根据 sessionHint 继续发下一条消息到飞书，勿退出会话。`
 - 超时：默认约 12 小时（或 `FEISHU_TURN_TIMEOUT`）；可用 `--timeout=N` 覆盖。**单轮超时后永不退出**：用 **心跳** `npx skill-message-bridge --heartbeat [--timeout=N]` 把会话重新拉起，挂起等飞书下一条（不推送任何内容）；或发「等待超时，如需继续请直接回复」后再发一条 `"<内容>"`。超时≠结束会话。
 

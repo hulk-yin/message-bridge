@@ -105,7 +105,7 @@ const pendingTasks = new Map();
 async function init() {
     if (isInitialized)
         return;
-    console.log("[MessageBridge] 初始化...");
+    process.stderr.write("[MessageBridge] 初始化...\n");
     httpClient = new lark.Client({
         appId: config.appId,
         appSecret: config.appSecret,
@@ -119,7 +119,7 @@ async function init() {
                 const content = JSON.parse(message.content);
                 const senderId = message.sender?.sender_id?.open_id || message.sender?.sender_id?.user_id || "unknown";
                 const text = content.text || "";
-                console.log(`[MessageBridge] 收到消息: ${text} (from ${senderId})`);
+                process.stderr.write(`[MessageBridge] 收到消息: ${text} (from ${senderId})\n`);
                 for (const [, task] of pendingTasks.entries()) {
                     if (task.status === "pending") {
                         task.reply = text;
@@ -128,7 +128,7 @@ async function init() {
                         task.repliedAt = new Date();
                         if (task.resolve)
                             task.resolve(task);
-                        console.log(`[MessageBridge] 任务 ${task.taskId} 已解决`);
+                        process.stderr.write(`[MessageBridge] 任务 ${task.taskId} 已解决\n`);
                         break;
                     }
                 }
@@ -156,8 +156,8 @@ async function init() {
     wsClient.start({ eventDispatcher: eventDispatcher });
     await new Promise((resolve) => setTimeout(resolve, 2000));
     isInitialized = true;
-    console.log("[MessageBridge] 初始化完成");
-    console.log("[MessageBridge] 请到飞书群聊或私聊中向机器人发送任意一条消息，收到后我会在飞书回复并说明后续用法。");
+    process.stderr.write("[MessageBridge] 初始化完成\n");
+    process.stderr.write("[MessageBridge] 请到飞书群聊或私聊中向机器人发送任意一条消息，收到后我会在飞书回复并说明后续用法。\n");
 }
 async function notify(params) {
     const { message, platform = "feishu", userId, groupId, timeout = 60 } = params;
@@ -180,7 +180,7 @@ async function notify(params) {
     try {
         const targetId = groupId || config.chatId || userId || "";
         const receiveIdType = groupId || config.chatId ? "chat_id" : "open_id";
-        console.log(`[MessageBridge] 发送消息 (${receiveIdType}): ${message}`);
+        process.stderr.write(`[MessageBridge] 发送消息 (${receiveIdType}): ${message}\n`);
         const res = await httpClient.im.message.create({
             params: { receive_id_type: receiveIdType },
             data: {
@@ -192,7 +192,7 @@ async function notify(params) {
         if (res.code !== 0)
             throw new Error(`发送失败: ${res.msg}`);
         const mid = res.data?.message_id ?? "";
-        console.log(`[MessageBridge] 消息已发送: ${mid}`);
+        process.stderr.write(`[MessageBridge] 消息已发送: ${mid}\n`);
         const result = await new Promise((resolve, reject) => {
             task.resolve = resolve;
             task.reject = reject;
@@ -227,7 +227,7 @@ async function send(params) {
     try {
         const targetId = groupId || config.chatId || userId || "";
         const receiveIdType = groupId || config.chatId ? "chat_id" : "open_id";
-        console.log(`[MessageBridge] 发送消息 (${receiveIdType}): ${message}`);
+        process.stderr.write(`[MessageBridge] 发送消息 (${receiveIdType}): ${message}\n`);
         const res = await httpClient.im.message.create({
             params: { receive_id_type: receiveIdType },
             data: {
@@ -239,7 +239,7 @@ async function send(params) {
         if (res.code !== 0)
             throw new Error(`发送失败: ${res.msg}`);
         const messageId = res.data?.message_id ?? "";
-        console.log(`[MessageBridge] 消息已发送: ${messageId}`);
+        process.stderr.write(`[MessageBridge] 消息已发送: ${messageId}\n`);
         return { success: true, messageId };
     }
     catch (error) {
@@ -248,7 +248,7 @@ async function send(params) {
 }
 function close() {
     if (wsClient)
-        console.log("[MessageBridge] 关闭连接");
+        process.stderr.write("[MessageBridge] 关闭连接\n");
     isInitialized = false;
 }
 function runConnectMode() {

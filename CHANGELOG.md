@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0] - 2026-02-12
+
+### Added
+
+- **超时时的明确指令**：当 `status` 为 `"timeout"` 时，`sessionHint` 输出「请执行 npx skill-message-bridge --heartbeat [--timeout=N] 重新拉起会话」，调用方可直接按此执行。
+
+### Changed
+
+- **对外唯一用法**：SKILL 明确仅一条命令 `npx skill-message-bridge "<内容>"`，config/connect/check-env 等为内部或首次配置逻辑。
+- **会话永不主动退出**：除用户明确「结束」「切回」外，超时/任务结束等均不结束；超时后须用 `--heartbeat` 重新拉起。
+- **默认超时 12 小时**：未设置 `FEISHU_TURN_TIMEOUT` 或 `--timeout` 时默认 43200 秒；`0` 或 `-1` 为最大安全秒数。
+- **stdout 仅单行 JSON**：所有 [MessageBridge] 日志改为 stderr，stdout 只输出一行 JSON，便于 agent 解析、减少历史噪音。
+
+---
+
 ## [0.2.0-beta.1] - 2026-02-12
 
 ### Added

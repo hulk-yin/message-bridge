@@ -81,8 +81,10 @@ const CONFIG_PATH = path.join(CONFIG_DIR, "config.json");
 const FEISHU_PAIRING_SUCCESS_GUIDE = "配对成功！已自动保存本会话，下次在 Cursor/Codex 里你只要说「切换到飞书」「切到飞书」或「离开一会」，就可以把对话切到这里继续和青鸟对话；说「结束」或「切回」则切回。";
 /** 每轮返回给调用方的会话提示，避免 Cursor 等忘记 in-loop 约束自动退出。不做内容匹配，是否结束由调用方根据语义判断。 */
 const SESSION_HINT_CONTINUE = "用户未说「结束」或「切回」前请继续循环发消息，勿退出飞书会话。";
-function sessionHint(_status, _reply) {
-    return SESSION_HINT_CONTINUE;
+/** 超时时的明确指令：让调用方执行 --heartbeat 重新拉起会话。 */
+const SESSION_HINT_TIMEOUT = "本轮超时，请执行 npx skill-message-bridge --heartbeat [--timeout=N] 重新拉起会话，勿退出。";
+function sessionHint(status, _reply) {
+    return status === "timeout" ? SESSION_HINT_TIMEOUT : SESSION_HINT_CONTINUE;
 }
 /** 会话回复后自动补一句给调用方（Cursor 等）的提醒。输出到 stderr，不破坏 stdout 单行 JSON。 */
 function printSessionReminder() {
